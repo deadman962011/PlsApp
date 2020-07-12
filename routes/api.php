@@ -13,6 +13,24 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+Route::post('/VisLogIn',['uses'=>'ApiController@VisitorLogIn']);
+
+Route::post('/VisRegister',['uses'=>"ApiController@VisitorRegister"]);
+
+Route::group(['middleware' =>  [ 'auth:api','jwt.auth']], function () {
+    
+    Route::get('/VisInfo',['uses'=>'ApiController@VisitorInfo']);
+
+    Route::post('/VisUpdate',['uses'=>'ApiController@VisitorUpdate']);
+
+    Route::get('/VisLogOut',['uses'=>'ApiController@VisitorLogOut']);
+
 });
+
+
+
+

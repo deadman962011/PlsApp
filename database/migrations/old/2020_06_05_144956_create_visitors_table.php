@@ -23,10 +23,10 @@ class CreateVisitorsTable extends Migration
             $table->String('vis_password');
             $table->String('role');
             $table->String('email');
-            $table->String('Vis_UserName');
-            $table->String('Vis_Status');
-            $table->String('Vis_RestPass_Token');
-            $table->String('Vis_Activation_Token');
+            $table->String('vis_username');
+            $table->String('vis_status');
+            $table->String('vis_restpass_token');
+            $table->String('vis_activation_token');
             $table->timestamps();
         });
     }

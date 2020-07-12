@@ -74,6 +74,10 @@ class RegisterController extends Controller
 //id	vis_name	vis_last_name	vis_phone	vis_city	vis_address	created_at	updated_at	vis_password	
                 return Visitor::create([
             'vis_name' => $data['name'],
+            'vis_username'=>'deadman962011',
+            'vis_Status'=>'1',
+            'vis_restpass_token'=>'123456789123456789',
+            'vis_activation_token'=>'123456789123456789',
             'vis_last_name'=>'test',
             'vis_phone'=>'1234567',
             'vis_city'=>1,
@@ -81,6 +85,6 @@ class RegisterController extends Controller
             'role'=>1,
             'email'=>$data['email'],
             'vis_password' => Hash::make($data['password']),
-        ]);
+        ]);		
     }
 }
