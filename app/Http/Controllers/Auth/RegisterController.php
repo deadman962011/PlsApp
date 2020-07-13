@@ -52,7 +52,7 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:Visitors'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }
@@ -61,7 +61,7 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
-     * @return \App\User
+     * @return \App\Visitor
      */
     protected function create(array $data)
     {
@@ -71,13 +71,17 @@ class RegisterController extends Controller
         //     'password' => Hash::make($data['password']),
         // ]);
         //
-//id	vis_name	vis_last_name	vis_phone	vis_city	vis_address	created_at	updated_at	vis_password	
+
+        //generate RestPass And Activation Token
+        $RestPassToken= md5(rand(1, 10) . microtime());
+        $ActivationToken=md5(rand(1, 12) . microtime());
+
                 return Visitor::create([
             'vis_name' => $data['name'],
             'vis_username'=>'deadman962011',
             'vis_Status'=>'1',
-            'vis_restpass_token'=>'123456789123456789',
-            'vis_activation_token'=>'123456789123456789',
+            'vis_restpass_token'=>$RestPassToken,
+            'vis_activation_token'=>$ActivationToken,
             'vis_last_name'=>'test',
             'vis_phone'=>'1234567',
             'vis_city'=>1,
