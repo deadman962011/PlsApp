@@ -67,20 +67,20 @@ class ApiController extends Controller
         $CheckVisUser=Visitor::where('vis_username',$request->input('VisUserNameI'))->count();
         if($CheckVisUser > 0){
     
-            return 'UserName Is already In Use';
+            return response()->json(['err',['err'=>'5','message'=>'UserNameUsedErr']],400);
         }
 
         //Check If Visitor Email Available
         $CheckVisMail=Visitor::where('email',$request->input('VisMailI'))->count();
         if($CheckVisMail > 0){
     
-            return 'Email Is already In Use';
+            return response()->json(['err',['err'=>'4','message'=>'MailUsedErr']],400);
         }
 
         //Check If Password Match
         if(! $request->input('VisPassI') == $request->input('VisPass2I') ){
 
-            return 'Password Not Match';
+            return response()->json(['err',['err'=>'6','message'=>'PassNotMatchErr']],400);
         }
 
         //generate RestPass And Activation Token
@@ -104,7 +104,7 @@ class ApiController extends Controller
         ]);
         $SaveVis->save();
         
-        return 'Saved';
+        return response()->json(['err',['err'=>'7','message'=>'VisitorSavedErr']],201);
 
     }
 
@@ -160,7 +160,7 @@ class ApiController extends Controller
             'vis_address'=>$request->input('VisAddressI')
         ]);
         
-        return 'Updated';
+        return response()->json(['err',['err'=>'8','message'=>'VisitorUpdated']],200);
 
     }
 
