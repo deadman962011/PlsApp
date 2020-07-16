@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
 use App\Visitor;
+use App\Category;
+use App\Service;
+use App\Rate;
+use App\Order;
 
 class ApiController extends Controller
 {
@@ -173,6 +177,263 @@ class ApiController extends Controller
         return response(200);
 
     }
+
+    public function CategoryAll (Request $request,$limit,$SortKey,$SortType)
+    {
+
+        //Check Limit Value
+        if($limit ==='null'){
+            $limit=null;
+        }
+
+        //Check OrderBy Inputs
+        if($SortKey !="null"){
+            $getCategory=Category::limit($limit)->orderBy($SortKey, $SortType)->get();
+        }
+        else{
+            $getCategory=Category::limit($limit)->get();
+        }
+
+        return response()->json(['Categoires'=>$getCategory],200);
+
+    }
+
+
+    public function CategoryOne($CatId)
+    {
+        
+        if(!empty($CatId)){
+
+            //get Category
+            $getCategory=Category::find($CatId);
+
+            if(!empty($getCategory)){
+
+                return response()->json(['Category'=>$getCategory],200);
+
+            }
+            else{
+                return response()->json(['err',['err'=>'1','message'=>'SWErr']],400);
+            }
+        }
+        else{
+            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+        }
+    }
+
+
+
+    public function ServiceAll($limit,$SortKey,$SortType)
+    {
+        
+        //Check Limit Value
+        if($limit ==='null'){
+            $limit=null;
+        }
+
+        //Check OrderBy Inputs
+        if($SortKey !="null"){
+            $getService=Service::limit($limit)->orderBy($SortKey, $SortType)->get();
+        }
+        else{
+            $getService=Service::limit($limit)->get();
+        }
+
+        $getService->load('Category');
+        return response()->json(['Services'=>$getService],200);
+
+    }
+
+    public function ServiceOne($ServiceId)
+    {
+        
+        if(!empty($ServiceId)){
+
+            //get Service
+            $getService=Service::find($ServiceId);
+
+            if(!empty($getService)){
+
+                return response()->json(['Service'=>$getService],200);
+
+            }
+            else{
+                return response()->json(['err',['err'=>'1','message'=>'SWErr']],400);
+            }
+        }
+        else{
+            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+        }
+
+    }
+
+    public function ServiceByCat($CatId,$limit,$SortType,$SortKey)
+    {
+        //Check Limit Value
+        if($limit ==='null'){
+            $limit=null;
+        }
+
+        if(!empty($CatId)){
+
+            //Check OrderBy Inputs
+            if($SortKey !="null"){
+                $getService=Service::where('category_id',$CatId)->limit($limit)->orderBy($SortKey, $SortType)->get();
+            }
+            else{
+                $getService=Service::where('category_id',$CatId)->limit($limit)->get();
+            }
+        
+            return response()->json(['Services'=>$getService],200);
+
+        }
+        else{
+
+            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+
+        }
+    }
+
+    public function SaveRate(Request $request)
+    {
+        
+
+        //Validate inputs
+        $validate = Validator::make(request()->all(), [
+            'VisitorIdI'=>"required",
+            'ServiceIdI'=>'required',
+            'RateValueI'=>'required'
+
+        ]);
+        if ($validate->fails()) {
+            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+        }
+
+        //Check Visitor
+        $getVisitor=Visitor::find($request->input('VisitorIdI'));
+
+        if(empty($getVisitor)){
+
+            return response()->json(['err',['err'=>'1','message'=>'SWErr']],400);
+        }
+
+        //Check Service
+        $getService=Service::find($request->input('ServiceIdI'));
+
+        if(empty($getService)){
+
+            return response()->json(['err',['err'=>'1','message'=>'SWErr']],400);
+        }
+
+        //Save Rate
+        $SaveRate=new Rate([
+            'visitor_id'=>$request->input('VisitorIdI'),
+            'service_id'=>$request->input('ServiceIdI'),
+            'rate_value'=>$request->input('RateValueI')
+        ]);
+        $SaveRate->save();
+        
+        return response()->json(['err',['err'=>'9','message'=>'RateSavedErr']],201);
+
+    }
+
+    public function SaveOrder(Request $request)
+    {
+        
+
+        //validate iNPUTS
+        $validate = Validator::make(request()->all(), [
+            'VisitorIdI'=>"required",
+            'ServiceIdI'=>'required',
+        ]);
+        if ($validate->fails()) {
+            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+        }
+
+        //Check Visitor
+        $getVisitor=Visitor::find($request->input('VisitorIdI'));
+
+        if(empty($getVisitor)){
+
+            return response()->json(['err',['err'=>'1','message'=>'SWErr']],400);
+        }
+
+        //Check Service
+        $getService=Service::find($request->input('ServiceIdI'));
+
+        if(empty($getService)){
+
+            return response()->json(['err',['err'=>'1','message'=>'SWErr']],400);
+        }
+
+        //get Service Price
+        $ServicePrice=$getService['ser_price'];
+
+        //Save Order
+        $SaveRate=new Order([
+            'Visitor_Id'=>$request->input('VisitorIdI'),
+            'Service_Id'=>$request->input('ServiceIdI'),
+            'Price'=>$ServicePrice,
+            'Status'=>0,
+            'Target_Id'=>'Dummy'
+        ]);
+        $SaveRate->save();
+
+        return response()->json(['err',['err'=>'10','message'=>'OrderSavedErr']],201);
+    }
+
+    public function OrderAll($limit,$SortType,$SortKey)
+    {
+        
+        //Check Limit Value
+        if($limit ==='null'){
+        $limit=null;
+        }
+
+        //get Visitor Id
+        $VisitorInf=Auth::guard('api')->user();
+
+        //Check OrderBy Inputs
+        if($SortKey !="null"){
+            $getOrder=Order::where('Visitor_Id',$VisitorInf['id'])->limit($limit)->orderBy($SortKey, $SortType)->get();
+        }
+        else{
+            $getOrder=Order::where('Visitor_Id',$VisitorInf['id'])->limit($limit)->get();
+        }
+
+        $getOrder->load('Service.Category');
+        $getOrder->load('Visitor');
+        return response()->json(['Orders'=>$getOrder],200);   
+
+    }
+
+    public function OrderOne($OrderId)
+    {
+        //validate Param
+        if(!empty($OrderId)){
+
+            //get Order
+            $getOrder=Order::find($OrderId);
+
+            if(!empty($getOrder)){
+
+                return response()->json(['Service'=>$getOrder],200);
+
+            }
+            else{
+                return response()->json(['err',['err'=>'1','message'=>'SWErr']],400);
+            }
+        }
+        else{
+            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+        }
+        
+
+
+    }
+
+
+
 
 
 

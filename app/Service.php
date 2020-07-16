@@ -20,4 +20,16 @@ class Service extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+
+    //New Relations
+
+    
+    public function Category()
+    {
+        return $this->hasOne(Category::class, 'id', 'category_id');
+    } 
+
+
+
 }

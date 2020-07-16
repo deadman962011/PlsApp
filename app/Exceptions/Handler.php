@@ -50,32 +50,31 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
-        if($request->is('api/*')){
+        // if($request->is('api/*')){
 
-
-            if (
-                  $request->is('api/VisLogIn')
-                ||$request->is('api/VisRegister')
-                &&  $request->expectsJson()
-            ){
-            //Do Nothing
-            } 
+        //     if (
+        //           $request->is('api/VisLogIn')
+        //         ||$request->is('api/VisRegister')
+        //         &&  $request->expectsJson()
+        //     ){
+        //     //Do Nothing
+        //     } 
             
-            else{
-                if ($exception instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
+        //     else{
+        //         if ($exception instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
                 
-                    return response()->json(['err',['err'=>'3','message' => 'TokenInvalidErr']],401);
-                }
-                else{
+        //             return response()->json(['err',['err'=>'3','message' => 'TokenInvalidErr']],401);
+        //         }
+        //         else{
                 
-                    return response()->json(['err',['err'=>'0','message' => 'UnauthorizedErr']], 401);
-                }
-                if ($exception instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException){
+        //             return response()->json(['err',['err'=>'0','message' => 'UnauthorizedErr']], 401);
+        //         }
+        //         if ($exception instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException){
             
-                    return response()->json(['err',['err'=>'2','message' => 'TokenExpiredErr']],401);
-                }
-            }
-        }
+        //             return response()->json(['err',['err'=>'2','message' => 'TokenExpiredErr']],401);
+        //         }
+        //     }
+        // }
         return parent::render($request, $exception);
     }
 }
