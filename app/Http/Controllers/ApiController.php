@@ -25,22 +25,34 @@ class ApiController extends Controller
             'VisPassI'=>'required'
         ]);
         if ($validate->fails()) {
-            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+            return response()->json([
+                'success'=>false,
+                'err'=>'1',
+                'message'=>'ValidationErr'
+                ],400);
         }
 
         //Authenticate By Mail
         if (!$token = Auth::guard('api')->attempt(array('email'=>$request->input('VisMailI'),'password'=>$request->input('VisPassI')))) 
         {
                  
-            return response()->json(['err',['err'=>'0','message' => 'UnauthorizedErr']], 401);
+            return response()->json([
+               'success'=>false,
+               'err'=>'0',
+               'message' => 'UnauthorizedErr'
+               ], 401);
 
         }
         else{
 
             //get Visitor 
             $getVisitor=Auth::guard('api')->user();
-            return response()->json(['Visitor'=>$getVisitor,'token' => $token,'expires' => auth('api')->factory()->getTTL() * 60,]);
-            
+            return response()->json([
+                'success'=>true,
+                'data'=>$getVisitor,
+                'token' => $token,
+                'expires' => auth('api')->factory()->getTTL() * 60,
+            ],200);
         }   
 
     }
@@ -64,27 +76,43 @@ class ApiController extends Controller
             'VisAddressI'=>'required',
         ]);
         if ($validate->fails()) {
-            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+            return response()->json([
+                   'success'=>false,
+                   'err'=>'1',
+                   'message'=>'ValidationErr'
+            ],400);
         }
 
         //Check If Visitor  Username Available
         $CheckVisUser=Visitor::where('vis_username',$request->input('VisUserNameI'))->count();
         if($CheckVisUser > 0){
     
-            return response()->json(['err',['err'=>'5','message'=>'UserNameUsedErr']],400);
+            return response()->json([
+                    'success'=>false,
+                    'err'=>'5',
+                    'message'=>'UserNameUsedErr'
+            ],400);
         }
 
         //Check If Visitor Email Available
         $CheckVisMail=Visitor::where('email',$request->input('VisMailI'))->count();
         if($CheckVisMail > 0){
     
-            return response()->json(['err',['err'=>'4','message'=>'MailUsedErr']],400);
+        return response()->json([
+            'success'=>false,
+            'err'=>'4',
+            'message'=>'MailUsedErr'
+        ],400);
         }
 
         //Check If Password Match
         if(! $request->input('VisPassI') == $request->input('VisPass2I') ){
 
-            return response()->json(['err',['err'=>'6','message'=>'PassNotMatchErr']],400);
+            return response()->json([
+                'success'=>false,
+                'err'=>'6',
+                'message'=>'PassNotMatchErr'
+            ],400);
         }
 
         //generate RestPass And Activation Token
@@ -108,7 +136,11 @@ class ApiController extends Controller
         ]);
         $SaveVis->save();
         
-        return response()->json(['err',['err'=>'7','message'=>'VisitorSavedErr']],201);
+    return response()->json([
+        'success'=>true,
+        'err'=>'7',
+        'message'=>'VisitorSavedErr'
+    ],201);
 
     }
 

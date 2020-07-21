@@ -55,6 +55,11 @@ class Handler extends ExceptionHandler
             if (
                   $request->is('api/VisLogIn')
                 ||$request->is('api/VisRegister')
+                ||$request->is('api/CategoryAll/*')
+                ||$request->is('api/CategoryOne/*')
+                ||$request->is('api/ServiceAll/*')
+                ||$request->is('api/ServiceOne/*')
+                ||$request->is('api/ServiceByCat/*')
                 &&  $request->expectsJson()
             ){
             //Do Nothing
