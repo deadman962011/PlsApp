@@ -152,7 +152,7 @@ class ApiController extends Controller
        //get Visitor
        $Visitor=Auth::guard('api')->user();
 
-       return response()->json(['Visitor'=>$Visitor], 200);
+       return response()->json($Visitor, 200);
 
     }
 
@@ -226,7 +226,7 @@ class ApiController extends Controller
             $getCategory=Category::limit($limit)->get();
         }
 
-        return response()->json(['Categoires'=>$getCategory],200);
+        return response()->json($getCategory,200);
 
     }
 
@@ -241,7 +241,7 @@ class ApiController extends Controller
 
             if(!empty($getCategory)){
 
-                return response()->json(['Category'=>$getCategory],200);
+                return response()->json($getCategory,200);
 
             }
             else{
@@ -272,7 +272,7 @@ class ApiController extends Controller
         }
 
         $getService->load('Category');
-        return response()->json(['Services'=>$getService],200);
+        return response()->json($getService,200);
 
     }
 
@@ -286,7 +286,7 @@ class ApiController extends Controller
 
             if(!empty($getService)){
 
-                return response()->json(['Service'=>$getService],200);
+                return response()->json($getService,200);
 
             }
             else{
@@ -316,7 +316,7 @@ class ApiController extends Controller
                 $getService=Service::where('category_id',$CatId)->limit($limit)->get();
             }
         
-            return response()->json(['Services'=>$getService],200);
+            return response()->json($getService,200);
 
         }
         else{
@@ -435,7 +435,7 @@ class ApiController extends Controller
 
         $getOrder->load('Service.Category');
         $getOrder->load('Visitor');
-        return response()->json(['Orders'=>$getOrder],200);   
+        return response()->json($getOrder,200);   
 
     }
 
@@ -449,7 +449,7 @@ class ApiController extends Controller
 
             if(!empty($getOrder)){
 
-                return response()->json(['Service'=>$getOrder],200);
+                return response()->json($getOrder,200);
 
             }
             else{
@@ -463,10 +463,6 @@ class ApiController extends Controller
 
 
     }
-
-
-
-
 
 
 }
