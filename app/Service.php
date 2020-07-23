@@ -28,8 +28,17 @@ class Service extends Model
     public function Category()
     {
         return $this->hasOne(Category::class, 'id', 'category_id');
-    } 
+    }
 
-
+    public function Rates()
+    {
+        return $this->hasMany(Rate::class, 'service_id', 'id');
+    }
+    
+    public function getRatesAvgAttribute()
+    {
+        return $this->Rates()->avg('rate_value') ?: 0;
+        // return $this->hasMany(Rate::class, 'service_id', 'id')->avg('rate_value');
+    }
 
 }

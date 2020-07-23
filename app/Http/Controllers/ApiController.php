@@ -272,6 +272,7 @@ class ApiController extends Controller
         }
 
         $getService->load('Category');
+        $getService->append('RatesAvg');
         return response()->json($getService,200);
 
     }
@@ -286,6 +287,10 @@ class ApiController extends Controller
 
             if(!empty($getService)){
 
+                $getService->load('Category');
+                $getService->append('RatesAvg');
+    
+                
                 return response()->json($getService,200);
 
             }
@@ -321,6 +326,8 @@ class ApiController extends Controller
         }
         else{
 
+            $getService->load('Category');
+            $getService->append('RatesAvg');
             return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
 
         }
