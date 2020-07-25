@@ -19,8 +19,8 @@ class CreateCompaniesTable extends Migration
             $table->integer('cmp_phone')->default(0);
             $table->tinyInteger('cmp_city');
             $table->string('cmp_email',200);
-            $table->String('cmp_Descreption');
-            $table->String('cmp_service_num');
+            $table->String('cmp_Descreption')->default("null");
+            $table->String('cmp_service_num')->default(0);
             $table->string('cmp_image')->default("");
             $table->timestamps();
         });

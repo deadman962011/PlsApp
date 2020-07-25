@@ -47,10 +47,7 @@
             <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
             <li class="nav-item"><a href="/ShowAllCompany" class="nav-link">companies</a></li>
             <li class="nav-item"><a href="/ShowAllService" class="nav-link">services</a></li>
-
             <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
-            <li class="nav-item cta mr-md-1"><a href="new-post.html" class="nav-link">Post a Service</a></li>
-            <li class="nav-item cta cta-colored"><a href="service-post.html" class="nav-link">Want a Service</a></li>
             <li class="nav-item cta mr-md-1"><a href="{{ route('login') }}" class="nav-link">Login</a></li>
 			      <li class="nav-item cta cta-colored"><a href="{{ route('register') }}" class="nav-link">Sign Up</a></li>
           </ul>

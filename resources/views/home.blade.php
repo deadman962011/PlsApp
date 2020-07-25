@@ -12,7 +12,7 @@
             <li><a href="ShowCategory6"><img src="{{Request::root()}}/website/images/Plmb.png" alt=""></a></li>
             <li><a href="ShowCategory7"><img src="{{Request::root()}}/website/images/Elct.png" alt=""></a></li>
             <li><a href="ShowCategory8"><img src="{{Request::root()}}/website/images/weld.png" alt=""></a></li>
-            <li><img class="home" src="{{Request::root()}}/website/images/home.png" alt=""></li>
+            <li><img class="home" src="{{Request::root()}}/website/images/plcRobot.png" alt=""></li>
             <li class="arrli"><img class="arrimg" src="{{Request::root()}}/website/images/arrfin.png" alt=""></li>
         </ul>
         
