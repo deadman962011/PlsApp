@@ -10,7 +10,7 @@ class Service extends Model
 {
      protected $table="services";
      protected $fillable=[
-    	'ser_name', 'ser_image', 'ser_description', 'ser_price',
+    	'ser_name', 'ser_image', 'ser_description', 'ser_price','ser_orderNum',
     ];
         public function companies()
     {

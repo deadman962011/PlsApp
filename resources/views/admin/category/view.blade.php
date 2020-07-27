@@ -4,6 +4,8 @@
  <div align="right" style="width: 335px; margin-left: 335px ;margin-bottom: 20px">
   <a href="{{ route('categories.index') }}" class="btn btn-default">Back</a>
  </div>
+ <img src="{{ URL::to('/') }}/images/{{ $data->cat_image }}" class="img-thumbnail" />
+
  <br />
  <h3>Name - {{ $data->cat_name }} </h3>
 </div>

@@ -22,6 +22,9 @@ class CreateServicesTable extends Migration
             $table->string('ser_image')->default("");
             $table->string('ser_description',1000);
             $table->integer('ser_price')->default(0);
+            $table->integer('ser_orderNum')->default(0);
+
+            
             $table->timestamps();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });

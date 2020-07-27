@@ -15,6 +15,9 @@
                 <a href="{{ route('categories.index') }}" class="btn btn-default">Back</a>
             </div>
             <br /> <br />
+
+
+
      <form method="post" action="{{ route('categories.update', $data->id) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PATCH')
@@ -23,7 +26,17 @@
           {!! Form::text('cat_name',$data->cat_name, ['class'=>'form-control col-md-8'])!!}
        </div>
        <br/>
-       <br/><br/>
+       <br/>
+       <div class="form-group">
+       <label class="col-md-4 text-right">Image for Category:</label>
+       <div class="col-md-8">
+        <input type="file" name="cat_image" />
+              <img src="{{ URL::to('/') }}/images/{{ $data->cat_image }}" class="img-thumbnail" width="100" />
+                        <input type="hidden" name="hidden_image" value="{{ $data->cat_image }}" />
+       </div>
+      </div>
+      
+      <br/>
        <div class="form-group text-center" style="width: 335px;margin-left: 300px">
        <input type="submit" name="edit" style="width: 235px" class="btn btn-primary input-lg" value="Edit" />
       </div>

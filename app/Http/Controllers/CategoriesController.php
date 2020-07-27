@@ -39,10 +39,20 @@ class CategoriesController extends Controller
     {
         $request->validate([
             'cat_name'      =>  'required',
+            'cat_image'     =>  'required|image|max:2048',
+
         ]);
 
+        $image = $request->file('cat_image');
+
+        $new_name = rand() . '.' . $image->getClientOriginalExtension();
+        $image->move(public_path('images'), $new_name);
+
+
         $form_data = array(
-            'cat_name' =>  $request->cat_name
+            'cat_name' =>  $request->cat_name,
+            'cat_image'     =>  $new_name
+
         );
 
         Category::create($form_data);
@@ -84,12 +94,31 @@ class CategoriesController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $image_name = $request->hidden_image;
+        $image = $request->file('cat_image');
+        if($image != '')
+        {
         $request->validate([
             'cat_name'      =>  'required',  
+            'cat_image'     =>  'required|image|max:2048'
+
             ]);
+
+            $image_name = rand() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $image_name);
+        }
+            else
+            {
+                $request->validate([
+                    'cat_name'      =>  'required'
+                    ]);
+            }
+
+
             $form_data = array(
-                'cat_name'      =>  $request->cat_name 
-                
+                'cat_name'      =>  $request->cat_name ,
+                'cat_image'     =>  $image_name
+
             );
       
             Category::whereId($id)->update($form_data);

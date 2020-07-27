@@ -11,12 +11,15 @@
 <table class="table table-bordered table-striped">
  <tr>
   <th width="20%">Name of Category</th>
+  <th width="20%">Image</th>
   <th width="10%">Action</th>
    <th width="5%">Delete</th>
  </tr>
  @foreach($data as $row)
   <tr>
    <td>{{ $row->cat_name }}</td>
+   <td><img src="{{ URL::to('/') }}/images/{{ $row->cat_image }}" class="img-thumbnail" width="75" /></td>
+
    <td>
       <a href="{{route('categories.show',$row->id)}}" class="btn btn-primary">Show</a>
       <a href="{{route('categories.edit',$row->id)}}" class="btn btn-warning">Edit</a>

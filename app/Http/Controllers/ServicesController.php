@@ -41,6 +41,8 @@ class ServicesController extends Controller
         'ser_name'            =>  'required',
         'ser_description'     =>  'required',
         'ser_price'           =>  'required',
+        'ser_orderNum'           =>  'required',
+
         'ser_image'           =>  'required|image|max:2048',
     ]);
 
@@ -52,6 +54,7 @@ class ServicesController extends Controller
         'ser_name'            =>  $request->ser_name ,
         'ser_description'     =>  $request->ser_description ,
         'ser_price'           =>  $request->ser_price ,
+        'ser_orderNum'        =>  $request->ser_orderNum,
         'ser_image'           =>  $new_name
     );
 
@@ -104,6 +107,8 @@ class ServicesController extends Controller
                 'ser_name'            =>  'required',
                 'ser_description'     =>  'required',
                 'ser_price'           =>  'required',
+                'ser_orderNum'           =>  'required',
+
                 'ser_image'           =>  'required|image|max:2048',
             ]);
 
@@ -116,12 +121,15 @@ class ServicesController extends Controller
             'ser_name'      =>  'required',
             'ser_description'     =>  'required',
             'ser_price'      =>  'required',
+            'ser_orderNum'           =>  'required',
+
             ]);
         }
         $form_data = array(
             'ser_name'      =>  $request->ser_name ,
             'ser_description'     =>  $request->ser_description ,
             'ser_price'      =>  $request->ser_price ,
+            'ser_orderNum'      =>  $request->ser_orderNum ,
             'ser_image'     =>  $image_name
         );
   
