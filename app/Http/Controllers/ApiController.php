@@ -11,6 +11,7 @@ use App\Category;
 use App\Service;
 use App\Rate;
 use App\Order;
+use App\Company;
 
 class ApiController extends Controller
 {
@@ -19,128 +20,253 @@ class ApiController extends Controller
     public function VisitorLogIn(Request $request)
     {
 
-        //Validate Inputs
-        $validate = Validator::make(request()->all(), [
-            'VisMailI'=>"required",
-            'VisPassI'=>'required'
-        ]);
-        if ($validate->fails()) {
-            return response()->json([
+        //Check Auth Type 
+        if(!empty($request->input('AuthTypeI')) && $request->input('AuthTypeI') == 1){
+            
+            //Visitor Authentication
+
+            //Validate Inputs
+            $validate = Validator::make(request()->all(), [
+                'VisMailI'=>"required",
+                'VisPassI'=>'required'
+            ]);
+            if ($validate->fails()) {
+                return response()->json([
+                    'success'=>false,
+                    'err'=>'1',
+                    'message'=>'ValidationErr'
+                    ],400);
+            }
+
+            //Authenticate By Mail
+            if (!$token = Auth::guard('api')->attempt(array('email'=>$request->input('VisMailI'),'password'=>$request->input('VisPassI')))) 
+            {
+                    
+                return response()->json([
                 'success'=>false,
-                'err'=>'1',
-                'message'=>'ValidationErr'
-                ],400);
+                'err'=>'0',
+                'message' => 'UnauthorizedErr'
+                ], 401);
+
+            }
+            else{
+
+                //get Visitor 
+                $getVisitor=Auth::guard('api')->user();
+                return response()->json([
+                    'success'=>true,
+                    'data'=>$getVisitor,
+                    'token' => $token,
+                    'expires' => auth('api')->factory()->getTTL() * 60,
+                ],200);
+            } 
+
         }
+        elseif(!empty($request->input('AuthTypeI')) && $request->input('AuthTypeI') == 2){
+           
+            //Company Authentication
 
-        //Authenticate By Mail
-        if (!$token = Auth::guard('api')->attempt(array('email'=>$request->input('VisMailI'),'password'=>$request->input('VisPassI')))) 
-        {
-                 
-            return response()->json([
-               'success'=>false,
-               'err'=>'0',
-               'message' => 'UnauthorizedErr'
-               ], 401);
+            //Validate Inputs
+            $validate = Validator::make(request()->all(), [
+                'VisMailI'=>"required",
+                'VisPassI'=>'required'
+            ]);
+            if ($validate->fails()) {
+                return response()->json([
+                    'success'=>false,
+                    'err'=>'1',
+                    'message'=>'ValidationErr'
+                    ],400);
+            }
 
+            //Authenticate By Mail
+            if (!$token = Auth::guard('apiCompany')->attempt(array('cmp_email'=>$request->input('VisMailI'),'password'=>$request->input('VisPassI')))) 
+            {
+                    
+                return response()->json([
+                'success'=>false,
+                'err'=>'0',
+                'message' => 'UnauthorizedErr'
+                ], 401);
+
+            }
+            else{
+
+                //get Visitor 
+                $getVisitor=Auth::guard('apiCompany')->user();
+                return response()->json([
+                    'success'=>true,
+                    'data'=>$getVisitor,
+                    'token' => $token,
+                    'expires' => auth('api')->factory()->getTTL() * 60,
+                ],200);
+            } 
         }
         else{
-
-            //get Visitor 
-            $getVisitor=Auth::guard('api')->user();
-            return response()->json([
-                'success'=>true,
-                'data'=>$getVisitor,
-                'token' => $token,
-                'expires' => auth('api')->factory()->getTTL() * 60,
-            ],200);
-        }   
+            return 'AuthType Empty';
+        }
 
     }
+
 
 
 
     public function VisitorRegister(Request $request)
     {
         
-        
-        //Validate inputs 
-        $validate = Validator::make(request()->all(), [
-            'VisNameI'=>"required",
-            'VisLastNameI'=>'required',
-            'VisMailI'=>'required',
-            'VisUserNameI'=>'required',
-            'VisPassI'=>'required',
-            'VisPass2I'=>'required',
-            'VisPhoneI'=>'required',
-            'VisCityI'=>'required',
-            'VisAddressI'=>'required',
-        ]);
-        if ($validate->fails()) {
-            return response()->json([
-                   'success'=>false,
-                   'err'=>'1',
-                   'message'=>'ValidationErr'
-            ],400);
-        }
-
-        //Check If Visitor  Username Available
-        $CheckVisUser=Visitor::where('vis_username',$request->input('VisUserNameI'))->count();
-        if($CheckVisUser > 0){
+        //Check Auth Type 
+        if(!empty($request->input('RegTypeI')) && $request->input('RegTypeI') == 1){
     
-            return response()->json([
+            //Visitor Registration
+
+                //Validate inputs 
+                $validate = Validator::make(request()->all(), [
+                    'VisNameI'=>"required",
+                    'VisLastNameI'=>'required',
+                    'VisMailI'=>'required|email',
+                    'VisUserNameI'=>'required',
+                    'VisPassI'=>'required',
+                    'VisPass2I'=>'required',
+                    'VisPhoneI'=>'required',
+                    'VisCityI'=>'required',
+                    'VisAddressI'=>'required',
+                ]);
+                if ($validate->fails()) {
+                    return response()->json([
+                        'success'=>false,
+                        'err'=>'1',
+                        'message'=>'ValidationErr'
+                    ],400);
+                }
+
+                //Check If Visitor  Username Available
+                $CheckVisUser=Visitor::where('vis_username',$request->input('VisUserNameI'))->count();
+                if($CheckVisUser > 0){
+            
+                    return response()->json([
+                            'success'=>false,
+                            'err'=>'5',
+                            'message'=>'UserNameUsedErr'
+                    ],400);
+                }
+
+                //Check If Visitor Email Available
+                $CheckVisMail=Visitor::where('email',$request->input('VisMailI'))->count();
+                if($CheckVisMail > 0){
+            
+                return response()->json([
                     'success'=>false,
-                    'err'=>'5',
-                    'message'=>'UserNameUsedErr'
-            ],400);
+                    'err'=>'4',
+                    'message'=>'MailUsedErr'
+                ],400);
+                }
+
+                //Check If Password Match
+                if(! $request->input('VisPassI') == $request->input('VisPass2I') ){
+
+                    return response()->json([
+                        'success'=>false,
+                        'err'=>'6',
+                        'message'=>'PassNotMatchErr'
+                    ],400);
+                }
+
+                //generate RestPass And Activation Token
+                $RestPassToken= md5(rand(1, 10) . microtime());
+                $ActivationToken=md5(rand(1, 12) . microtime());
+
+                //Save Visitor 
+                $SaveVis=new Visitor([
+                    'vis_name'=>$request->input('VisNameI'),
+                    'vis_last_name'=>$request->input('VisLastNameI'),
+                    'email'=>$request->input('VisMailI'),
+                    'vis_username'=>$request->input('VisUserNameI'),
+                    'vis_password'=>bcrypt($request->input('VisPassI')),
+                    'vis_Status'=>0,
+                    'vis_phone'=>$request->input('VisPhoneI'),
+                    'vis_city'=>$request->input('VisCityI'),
+                    'vis_address'=>$request->input('VisAddressI'),
+                    'vis_restpass_token'=>$RestPassToken,
+                    'vis_activation_token'=>$ActivationToken,
+                    'role'=>0,
+                ]);
+                $SaveVis->save();
+                
+            return response()->json([
+                'success'=>true,
+                'err'=>'7',
+                'message'=>'VisitorSavedErr'
+            ],201);
+
         }
+        elseif(!empty($request->input('RegTypeI')) && $request->input('RegTypeI') == 2){
 
-        //Check If Visitor Email Available
-        $CheckVisMail=Visitor::where('email',$request->input('VisMailI'))->count();
-        if($CheckVisMail > 0){
-    
-        return response()->json([
-            'success'=>false,
-            'err'=>'4',
-            'message'=>'MailUsedErr'
-        ],400);
-        }
+            //Company Registration
 
-        //Check If Password Match
-        if(! $request->input('VisPassI') == $request->input('VisPass2I') ){
+         
+           //Validate inputs 
+            $validate = Validator::make(request()->all(), [
+                'VisNameI'=>"required",
+                'VisMailI'=>'required|email',
+                'VisPassI'=>'required',
+                'VisPass2I'=>'required',
+                'VisPhoneI'=>'required',
+                'VisCityI'=>'required',
+                'VisImageI'=>'required',
+            ]);
+            if ($validate->fails()) {
+                return response()->json([
+                    'success'=>false,
+                    'err'=>'1',
+                    'message'=>'ValidationErr'
+                ],400);
+            }
 
+            //Check If Company Email Available
+            $CheckCmpMail=Company::where('cmp_email',$request->input('VisMailI'))->count();
+            if($CheckCmpMail > 0){
+        
             return response()->json([
                 'success'=>false,
-                'err'=>'6',
-                'message'=>'PassNotMatchErr'
+                'err'=>'4',
+                'message'=>'MailUsedErr'
             ],400);
+            }
+
+            //Check If Password Match
+            if(! $request->input('VisPassI') == $request->input('VisPass2I') ){
+
+                return response()->json([
+                    'success'=>false,
+                    'err'=>'6',
+                    'message'=>'PassNotMatchErr'
+                ],400);
+            }
+
+            //Save Comany
+            //
+            $SaveCmp=new Company([
+                'cmp_name'=>$request->input('VisNameI'),
+                'cmp_phone'=>$request->input('VisPhoneI'),
+                'cmp_city'=>$request->input('VisCityI'),
+                'cmp_email'=>$request->input('VisMailI'),
+                'cmp_image'=>$request->input('VisImageI'),
+                'cmp_password'=>bcrypt($request->input('VisPassI')),
+
+            ]);
+            $SaveCmp->save();
+            
+        return response()->json([
+            'success'=>true,
+            'err'=>'9',
+            'message'=>'CompanySavedErr'
+        ],201);
+
+        }
+        else{
+            return 'RegType Input Empty';
         }
 
-        //generate RestPass And Activation Token
-        $RestPassToken= md5(rand(1, 10) . microtime());
-        $ActivationToken=md5(rand(1, 12) . microtime());
-
-        //Save Visitor 
-        $SaveVis=new Visitor([
-            'vis_name'=>$request->input('VisNameI'),
-            'vis_last_name'=>$request->input('VisLastNameI'),
-            'email'=>$request->input('VisMailI'),
-            'vis_username'=>$request->input('VisUserNameI'),
-            'vis_password'=>bcrypt($request->input('VisPassI')),
-            'vis_Status'=>0,
-            'vis_phone'=>$request->input('VisPhoneI'),
-            'vis_city'=>$request->input('VisCityI'),
-            'vis_address'=>$request->input('VisAddressI'),
-            'vis_restpass_token'=>$RestPassToken,
-            'vis_activation_token'=>$ActivationToken,
-            'role'=>0,
-        ]);
-        $SaveVis->save();
-        
-    return response()->json([
-        'success'=>true,
-        'err'=>'7',
-        'message'=>'VisitorSavedErr'
-    ],201);
 
     }
 
@@ -272,7 +398,7 @@ class ApiController extends Controller
         }
 
         $getService->load('Category');
-        $getService->append('RatesAvg');
+
         return response()->json($getService,200);
 
     }
@@ -320,18 +446,50 @@ class ApiController extends Controller
             else{
                 $getService=Service::where('category_id',$CatId)->limit($limit)->get();
             }
-        
+            $getService->load('Category');
+
             return response()->json($getService,200);
 
         }
         else{
 
-            $getService->load('Category');
-            $getService->append('RatesAvg');
             return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
 
         }
     }
+
+
+
+    public function ServiceByCmp($CmpId,$limit,$SortType,$SortKey)
+    {
+        //Check Limit Value
+        if($limit ==='null'){
+            $limit=null;
+        }
+
+        if(!empty($CmpId)){
+
+            //Check OrderBy Inputs
+            if($SortKey !="null"){
+                $getService=Service::where('company_id',$CmpId)->limit($limit)->orderBy($SortKey, $SortType)->get();
+            }
+            else{
+                $getService=Service::where('company_id',$CmpId)->limit($limit)->get();
+            }
+            
+            $getService->load('Category');
+
+            return response()->json($getService,200);
+
+        }
+        else{
+
+            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+        }
+    }
+
+
+
 
     public function SaveRate(Request $request)
     {
@@ -470,6 +628,52 @@ class ApiController extends Controller
 
 
     }
+
+
+    public function SaveService(Request $request)
+    {
+
+        //validate inputs
+
+        $validate = Validator::make(request()->all(), [
+            'ServiceNameI'=>"required",
+            'ServiceImgI'=>'required',
+            'ServiceDescI'=>'required',
+            'ServicePriceI'=>'required',
+            'CategoryIdI'=>'required',
+            'CompanyIdI'=>'required'
+        ]);
+        if ($validate->fails()) {
+            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+        }
+
+        //Save Service
+        $SaveService=new Service([
+            'ser_name'=>$request->input('ServiceNameI'),
+            'category_id'=>$request->input('CategoryIdI'),
+            'company_id'=>$request->input('CompanyIdI'),
+            'ser_image'=>$request->input('ServiceImgI'),
+            'ser_description'=>$request->input('ServiceDescI'),
+            'ser_price'=>$request->input('ServicePriceI')
+        ]);
+        $SaveService->save();
+
+        return response()->json(['err',['err'=>'1','message'=>'ServiceSavedErr']],200);
+
+        //        
+    }
+
+
+
+
+    
+
+
+
+
+
+
+
 
 
 }

@@ -21,6 +21,7 @@ class CreateCompaniesTable extends Migration
             $table->string('cmp_email',200);
             $table->String('cmp_Descreption')->default("null");
             $table->String('cmp_service_num')->default(0);
+            $table->String('cmp_password');
             $table->string('cmp_image')->default("");
             $table->timestamps();
         });

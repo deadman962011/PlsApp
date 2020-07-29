@@ -60,6 +60,8 @@ class Handler extends ExceptionHandler
                 ||$request->is('api/ServiceAll/*')
                 ||$request->is('api/ServiceOne/*')
                 ||$request->is('api/ServiceByCat/*')
+                ||$request->is('api/SaveService')
+                ||$request->is('api/ServiceByCmp/*')
                 &&  $request->expectsJson()
             ){
             //Do Nothing

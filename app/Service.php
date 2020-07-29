@@ -10,8 +10,12 @@ class Service extends Model
 {
      protected $table="services";
      protected $fillable=[
-    	'ser_name', 'ser_image', 'ser_description', 'ser_price','ser_orderNum',
+    	'ser_name', 'ser_image', 'ser_description', 'ser_price','ser_orderNum','category_id','company_id'
     ];
+    protected $appends = [
+        'RatesAvg'
+    ];
+
         public function companies()
     {
         return $this->belongsToMany(Company::class,'company_services');
@@ -37,7 +41,7 @@ class Service extends Model
     
     public function getRatesAvgAttribute()
     {
-        return $this->Rates()->avg('rate_value') ?: 0;
+         return $this->Rates()->avg('rate_value') ?: 0;
         // return $this->hasMany(Rate::class, 'service_id', 'id')->avg('rate_value');
     }
 

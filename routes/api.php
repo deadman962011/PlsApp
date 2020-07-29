@@ -31,6 +31,8 @@ Route::get('ServiceOne/{ServiceId}',['uses'=>'ApiController@ServiceOne']);
 
 Route::get('ServiceByCat/{CatId}/{limit}/{SortType}/{SortKey}',['uses'=>"ApiController@ServiceByCat"]);
 
+Route::get('ServiceByCmp/{CmpId}/{limit}/{SortType}/{SortKey}',['uses'=>"ApiController@ServiceByCmp"]);
+
 
 Route::group(['middleware' =>  [ 'auth:api','jwt.auth']], function () {
     
@@ -48,7 +50,12 @@ Route::group(['middleware' =>  [ 'auth:api','jwt.auth']], function () {
 
     Route::get('OrderOne/{OrderId}',['uses'=>'ApiController@OrderOne']);
     
+});
 
+Route::group(['middleware' => ['auth:apiCompany','jwt.auth']], function () {
+
+    Route::post('SaveService',['uses'=>'ApiController@SaveService']);
+    
 });
 
 
