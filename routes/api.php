@@ -17,9 +17,13 @@ use Illuminate\Http\Request;
 //     return $request->user();
 // });
 
-Route::post('/VisLogIn',['uses'=>'ApiController@VisitorLogIn']);
+Route::get('test',function(){
+    return bcrypt('123456789');
+});
 
-Route::post('/VisRegister',['uses'=>"ApiController@VisitorRegister"]);
+Route::post('VisLogIn',['uses'=>'ApiController@VisitorLogIn']);
+
+Route::post('VisRegister',['uses'=>"ApiController@VisitorRegister"]);
 
 Route::get('CategoryAll/{limit}/{SortKey}/{SortType}',['uses'=>'ApiController@CategoryAll']);
 
@@ -32,7 +36,6 @@ Route::get('ServiceOne/{ServiceId}',['uses'=>'ApiController@ServiceOne']);
 Route::get('ServiceByCat/{CatId}/{limit}/{SortType}/{SortKey}',['uses'=>"ApiController@ServiceByCat"]);
 
 Route::get('ServiceByCmp/{CmpId}/{limit}/{SortType}/{SortKey}',['uses'=>"ApiController@ServiceByCmp"]);
-
 
 Route::group(['middleware' =>  [ 'auth:api','jwt.auth']], function () {
     
@@ -49,12 +52,28 @@ Route::group(['middleware' =>  [ 'auth:api','jwt.auth']], function () {
     Route::get('OrderAll/{limit}/{SortType}/{SortKey}',['uses'=>'ApiController@OrderAll']);
 
     Route::get('OrderOne/{OrderId}',['uses'=>'ApiController@OrderOne']);
+
+    Route::post('NotifAll',['uses'=>'ApiController@NotifAll']);
+
+    Route::post('MessageAll',['uses'=>'ApiController@MessageAll']);
+
+    Route::post('SaveRateCmp',['uses'=>'ApiController@SaveRateCmp']);
+
+    Route::post('SaveCommentCmp',['uses'=>'ApiController@SaveCommentCmp']);
+
+    Route::get('CmpRateAll/{limit}/{CmpId}',['uses'=>'ApiController@CmpRateAll']);
+
+    Route::get('CmpCommentAll/{limit}/{CmpId}',['uses'=>'ApiController@CmpCommentAll']);
     
 });
 
 Route::group(['middleware' => ['auth:apiCompany','jwt.auth']], function () {
 
     Route::post('SaveService',['uses'=>'ApiController@SaveService']);
+
+    Route::post('NotifAll',['uses'=>'ApiController@NotifAll']);
+
+    Route::post('MessageAll',['uses'=>'ApiController@MessageAll']);
     
 });
 

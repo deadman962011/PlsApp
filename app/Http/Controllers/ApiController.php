@@ -12,7 +12,10 @@ use App\Service;
 use App\Rate;
 use App\Order;
 use App\Company;
-
+use App\Notification;
+use App\Message;
+use App\CompanyRate;
+use App\CompanyComment;
 class ApiController extends Controller
 {
     //
@@ -663,6 +666,227 @@ class ApiController extends Controller
         //        
     }
 
+    public function NotifAll(Request $request)
+    {
+
+        //validate inputs
+        $validate = Validator::make(request()->all(), [
+            'AuthTypeI'=>"required",
+            'LimitI'=>'required',
+        ]);
+        if ($validate->fails()) {
+            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+        }
+
+        //Check Limit Value
+        if($request->input('LimitI') == 'null'){
+            $limit=null;
+        }
+        else{
+            $limit=$request->input('LimitI');
+        }
+
+        //Check Auh Type
+        if($request->input('AuthTypeI') == 1){
+
+            //Check get Visitor
+            $Visitor=Auth::guard('api')->user();
+
+            if(empty($Visitor)){
+                return response()->json(['err',['err'=>'1','message'=>'SWErr']],400);
+            }
+            
+            //get Visitor Notification
+            $getNotif=Notification::where([['NotifTargetType',1],['NotifTargetId',$Visitor['id']]])->limit($limit)->get();
+
+            return response()->json($getNotif, 200);
+
+        }
+        elseif($request->input('AuthTypeI') == 2){
+
+            //get Company
+            $Company=Auth::guard('apiCompany')->user();
+
+            if (empty($Company)) {
+                return response()->json(['err',['err'=>'1','message'=>'SWErr']],400);
+            }
+
+            //get Visitor Notification
+            $getNotif=Notification::where([['NotifTargetType',2],['NotifTargetId',$Company['id']]])->limit($limit)->get();
+
+            return response()->json($getNotif, 200);
+
+        }
+        
+    }
+
+    public function MessageAll(Request $request)
+    {
+        //validate inputs
+        $validate = Validator::make(request()->all(), [
+            'AuthTypeI'=>"required",
+            'LimitI'=>'required',
+        ]);
+        if ($validate->fails()) {
+            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+        }
+
+        //Check Limit
+        if($request->input('LimitI') == 'null'){
+            $limit=null;
+        }
+        else{
+            $limit=$request->input('LimitI');
+        }
+
+        //Check AuthType
+        if($request->input('AuthTypeI') == 1){
+
+            //Check get Visitor
+            $Visitor=Auth::guard('api')->user();
+
+            if(empty($Visitor)){
+                return response()->json(['err',['err'=>'1','message'=>'SWErr']],400);
+            }
+            
+            //get Visitor Messages
+            $getMessage=Message::where([['MessageTargetType',1],['MessageTarget',$Visitor['id']]])->limit($limit)->get();
+           
+
+            return response()->json($getMessage, 200);
+
+        }
+        elseif($request->input('AuthTypeI') == 2){
+
+            //get Company
+            $Company=Auth::guard('apiCompany')->user();
+
+            if (empty($Company)) {
+                return response()->json(['err',['err'=>'1','message'=>'SWErr']],400);
+            }
+
+            //get Company Messages
+            $getMessage=Message::where([['MessageTargetType',2],['MessageTarget',$Company['id']]])->limit($limit)->get();
+           //$getMessage->load('user');
+
+            return response()->json($getMessage, 200);
+        
+        }
+
+    }
+
+
+    public function SaveRateCmp(Request $request)
+    {
+        //validate inputs
+        $validate = Validator::make(request()->all(), [
+            'CompanyIdI'=>"required",
+            'CompanyRateI'=>'required',
+            'CompanyRateDescI'=>'required'
+        ]);
+        if ($validate->fails()) {
+            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+        }
+
+        //get Visitor
+        $Visitor=Auth::guard('api')->user();
+
+        //get And Check Company
+        $getCmp=Company::find($request->input('CompanyIdI'));
+        if(empty($getCmp)){
+
+            return response()->json(['err',['err'=>'1','message'=>'SWErr']],400);
+        }
+
+        //Save Company Rate 
+        $SaveCmpRate=new CompanyRate([
+            'company_id'=>$getCmp['id'],
+            'visitor_id'=>$Visitor['id'],
+            'rate_value'=>$request->input('CompanyRateI'),
+            'rate_desc'=>$request->input('CompanyRateDescI')
+        ]);
+        $SaveCmpRate->save();
+
+        return response()->json(['err',['err'=>'0','message'=>'CmpRateSavedErr']],200);
+    }
+
+
+    public function SaveCommentCmp(Request $request)
+    {
+        //
+        //validate inputs
+        $validate = Validator::make(request()->all(), [
+            'CompanyIdI'=>"required",
+            'CommentValueI'=>'required',
+        ]);
+        if ($validate->fails()) {
+            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+        }
+
+        //get Visitor
+        $Visitor=Auth::guard('api')->user();
+
+        //get And Check Company
+        $getCmp=Company::find($request->input('CompanyIdI'));
+        if(empty($getCmp)){
+
+            return response()->json(['err',['err'=>'1','message'=>'SWErr']],400);
+        }
+
+        //Save Company Comment	
+        $SaveCmpComment=new CompanyComment([
+            'company_id'=>$getCmp['id'],
+            'visitor_id'=>$Visitor['id'],
+            'comment_value'=>$request->input('CommentValueI'),
+            'comment_vote'=>0
+        ]);
+        $SaveCmpComment->save();
+
+        return response()->json(['err',['err'=>'0','message'=>'CmpRateSavedErr']],200);
+
+    }
+
+    public function CmpRateAll($limit,$CmpId)
+    {
+        //validate Input 
+
+        if(empty($CmpId)){
+
+            return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+        }
+
+        //Check Limit Value
+        if($limit ==='null'){
+            $limit=null;
+        }
+
+        //get Company Rates
+        $getCmpRates=CompanyRate::where('company_id',$CmpId)->limit($limit)->get();
+
+        return response()->json($getCmpRates, 200);
+
+    }
+
+    public function CmpCommentAll($limit,$CmpId)
+    {
+               //validate Input 
+
+               if(empty($CmpId)){
+
+                return response()->json(['err',['err'=>'1','message'=>'ValidationErr']],400);
+            }
+    
+            //Check Limit Value
+            if($limit ==='null'){
+                $limit=null;
+            }
+    
+            //get Company Comments
+            $getCmpComments=CompanyComment::where('company_id',$CmpId)->limit($limit)->get();
+    
+            return response()->json($getCmpComments, 200);
+    
+    }
 
 
 
